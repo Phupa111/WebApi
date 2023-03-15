@@ -7,7 +7,7 @@ use Slim\Exception\HttpNotFoundException;
 require __DIR__ . '/vendor/autoload.php';
 
 $app = AppFactory::create();
-$app->setBasePath('/projectWebapi');
+$app->setBasePath('/WebApiGit');
 
 
 require __DIR__ . '/dbconnect.php';
