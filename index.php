@@ -12,6 +12,7 @@ $app->setBasePath('/WebApiGit');
 
 require __DIR__ . '/dbconnect.php';
 require __DIR__ . '/api/food.php';
+require __DIR__ . '/api/foodtype.php';
 
 
 $app->options('/{routes:.+}', function ($request, $response, $args) {
