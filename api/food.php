@@ -40,7 +40,6 @@ $app->get('/foods/type/{type}', function (Request $request, Response $response, 
     ->withHeader('Content-Type', 'application/json; charset=utf-8')
     ->withStatus(200);
   
- 
 });
 
 ?>
