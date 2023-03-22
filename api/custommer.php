@@ -55,7 +55,7 @@ $app->post('/custommer/login', function (Request $request, Response $response, $
 
 $app->get('/getCusid/{username}', function (Request $request, Response $response, $args) {
     $conn =$GLOBALS['connect'];
-    $sql = 'select cid from customer where username = ?';
+    $sql = 'select cid,name,money,address,phone from customer where username = ?';
     $stmt = $conn->prepare($sql);
     $cid = $args['username'];
     $stmt->bind_param('s', $cid);
