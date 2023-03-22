@@ -15,6 +15,9 @@ require __DIR__ . '/dbconnect.php';
 require __DIR__ . '/api/food.php';
 require __DIR__ . '/api/foodtype.php';
 require __DIR__ . '/api/owner.php';
+require __DIR__ . '/api/orederItem.php';
+require __DIR__ . '/api/bil.php';
+require __DIR__ . '/api/custommer.php';
 
 
 $app->options('/{routes:.+}', function ($request, $response, $args) {
