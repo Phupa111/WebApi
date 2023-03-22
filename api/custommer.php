@@ -3,14 +3,16 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 $app->post('/custommer/addPass', function (Request $request, Response $response, $args) {
+    $json = $request->getBody();
+    $jsonData = json_decode($json,true);
     $conn =$GLOBALS['connect'];
-    $body = $request->getParsedBody();
-    $username = $body['username'];
-    $password = $body['password'];
-    $hashPass = password_hash($password,PASSWORD_DEFAULT);
+    // $body = $request->getParsedBody();
+    // $username = $body['username'];
+    // $password = $body['password'];
+    $hashPass = password_hash($jsonData['password'],PASSWORD_DEFAULT);
     $sql = 'UPDATE customer SET password = ? where username = ? ';
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ss",$hashPass,$username);
+    $stmt->bind_param("ss",$hashPass,$jsonData['username']);
     $stmt->execute();
     $result = $stmt->get_result();
     
@@ -24,14 +26,17 @@ $app->post('/custommer/addPass', function (Request $request, Response $response,
 });
 
 $app->post('/custommer/login', function (Request $request, Response $response, $args) {
+    $json = $request->getBody();
+    $jsonData = json_decode($json,true);
     $conn =$GLOBALS['connect'];
-    $body = $request->getParsedBody();
-    $username = $body['username'];
-    $password = $body['password'];
 
-    $pwdInDB = getPasswordFromDB($conn,$username);
+    // $body = $request->getParsedBody();
+    // $username = $body['username'];
+    // $password = $body['password'];
 
-    if(password_verify($password,$pwdInDB))
+    $pwdInDB = getPasswordFromDB($conn,$jsonData['username']);
+
+    if(password_verify($jsonData['password'],$pwdInDB))
     {
         $result = "login Success";
     }
@@ -39,7 +44,6 @@ $app->post('/custommer/login', function (Request $request, Response $response, $
     {
         $result = "login fail!!";
     }
-    
    
     $response->getBody()->write(json_encode($result, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
     return $response
@@ -47,6 +51,26 @@ $app->post('/custommer/login', function (Request $request, Response $response, $
     ->withStatus(200);
   
  
+});
+
+$app->get('/getCusid/{username}', function (Request $request, Response $response, $args) {
+    $conn =$GLOBALS['connect'];
+    $sql = 'select cid from customer where username = ?';
+    $stmt = $conn->prepare($sql);
+    $cid = $args['username'];
+    $stmt->bind_param('s', $cid);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $data = array();
+   
+    foreach ($result as $row) {
+        array_push($data, $row);
+    }
+    $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
+    return $response
+    ->withHeader('Content-Type', 'application/json; charset=utf-8')
+    ->withStatus(200);
+  
 });
 
 function getPasswordFromDB($conn,$username)
@@ -63,7 +87,6 @@ function getPasswordFromDB($conn,$username)
           
         }
         return $dbPassword;
-        
     }
 
 ?>
