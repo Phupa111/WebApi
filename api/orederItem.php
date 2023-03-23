@@ -5,7 +5,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 $app->get('/orederItem/{blid}', function (Request $request, Response $response, $args) {
     $conn =$GLOBALS['connect'];
     $blid= $args['blid'];
-    $sql = 'SELECT orderitems.blid, food.fid, food.name, orderitems.amount, SUM(food.price * orderitems.amount) 
+    $sql = 'SELECT orderitems.blid, food.fid, food.name, orderitems.amount, food.price , orderitems.amount
     FROM orderitems 
     JOIN food ON orderitems.fid = food.fid 
     WHERE orderitems.blid = ?
@@ -46,14 +46,74 @@ $app->get('/orederItem', function (Request $request, Response $response, $args) 
  
 });
 
-$app->delete('/orderItem/delete/{bid}', function (Request $request, Response $response, $args) {
+$app->get('/orederItem/plus/{bid}/{fid}', function (Request $request, Response $response, $args) {
+    $conn =$GLOBALS['connect'];
+    $bid= $args['bid'];
+    $fid= $args['fid'];
+    $sql = 'UPDATE `orderitems` SET `amount` = `amount` + 1 WHERE `blid` = ? AND `fid` = ?;';
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii",$bid,$fid);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+  
+
+    $sql = 'SELECT * FROM orderitems where `blid` = ? AND `fid` = ?;';
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii",$bid,$fid);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $data = array();
+   
+    foreach ($result as $row) {
+        array_push($data, $row);
+    }
+    $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
+    return $response
+    ->withHeader('Content-Type', 'application/json; charset=utf-8')
+    ->withStatus(200);
+  
+ 
+});
+$app->get('/orederItem/minus/{bid}/{fid}', function (Request $request, Response $response, $args) {
+    $conn =$GLOBALS['connect'];
+    $bid= $args['bid'];
+    $fid= $args['fid'];
+    $sql = 'UPDATE `orderitems` SET `amount` = `amount` - 1 WHERE `blid` = ? AND `fid` = ?;';
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii",$bid,$fid);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    $sql = 'SELECT * FROM orderitems where `blid` = ? AND `fid` = ?;';
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii",$bid,$fid);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $data = array();
+   
+    foreach ($result as $row) {
+        array_push($data, $row);
+    }
+    $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
+    return $response
+    ->withHeader('Content-Type', 'application/json; charset=utf-8')
+    ->withStatus(200);
+  
+ 
+});
+
+$app->delete('/orderItem/delete/{bid}/{fid}', function (Request $request, Response $response, $args) {
     $conn =$GLOBALS['connect'];
     
     $bid= $args['bid'];
+    $fid = $args['fid'];
     
-    $sql ="DELETE FROM `orderitems` WHERE blid = ?";
+    $sql ="DELETE FROM `orderitems` WHERE blid = ? AND fid = ?";
     $stmt =$conn->prepare($sql);
-    $stmt->bind_param("i",$bid);
+    $stmt->bind_param("ii",$bid,$fid);
     $stmt->execute();
     $result =$stmt->affected_rows;
 
