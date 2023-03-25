@@ -134,6 +134,8 @@ $app->post('/orderItem/insert', function (Request $request, Response $response, 
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("iii",$jsonData['bid'],$jsonData['fid'],$jsonData['amount']);
     $stmt->execute();
+
+    
  
     $response->getBody()->write(json_encode("Data inserted successfully", JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
     return $response
