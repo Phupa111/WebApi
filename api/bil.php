@@ -12,8 +12,17 @@ $app->post('/bill/insert', function (Request $request, Response $response, $args
     $stmt->bind_param("i",$jsonData['cid']);
     $stmt->execute();
     $result = $stmt->get_result();
+
+   
+
+
+    $data = array();
+   
+    foreach ($result as $row) {
+        array_push($data, $row);
+    }
  
-    $response->getBody()->write(json_encode($result, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
+    $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
     return $response
     ->withHeader('Content-Type', 'application/json; charset=utf-8')
     ->withStatus(200);
@@ -25,6 +34,29 @@ $app->get('/bill', function (Request $request, Response $response, $args) {
     $conn =$GLOBALS['connect'];
     $sql = 'SELECT * FROM bill';
     $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $data = array();
+   
+    foreach ($result as $row) {
+        array_push($data, $row);
+    }
+ 
+    $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
+    return $response
+    ->withHeader('Content-Type', 'application/json; charset=utf-8')
+    ->withStatus(200);
+  
+ 
+});
+
+$app->get('/bill/{cid}', function (Request $request, Response $response, $args) {
+
+    $conn =$GLOBALS['connect'];
+    $cid= $args['cid'];
+    $sql = 'SELECT * FROM bill WHERE cid = ?';
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i",$cid);
     $stmt->execute();
     $result = $stmt->get_result();
     $data = array();
