@@ -66,3 +66,47 @@
         return $response->withHeader('Content-Type','application/json; charset=utf-8')
                         ->withStatus(200);
     });
+
+    $app->post('/ownerLogin', function (Request $request, Response $response, $args) {
+        $json = $request->getBody();
+        $jsonData = json_decode($json,true);
+        $conn =$GLOBALS['connect'];
+
+        //     $body = $request->getParsedBody();
+        // $username = $body['username'];
+        // $password = $body['password'];
+    
+        $pwdInDB = getPasswordOwner($conn,$jsonData['username']);
+    
+        if(password_verify($jsonData['password'],$pwdInDB))
+        {
+            $result = "login Success";
+        }
+        else
+        {
+            $result = "login fail!!";
+        }
+       
+        $response->getBody()->write(json_encode($result, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
+        return $response
+        ->withHeader('Content-Type', 'application/json; charset=utf-8')
+        ->withStatus(200);
+      
+     
+    });
+
+    function getPasswordOwner($conn,$username)
+    {
+        $sql = "SELECT password from owner where username = ?";
+        $stmt =$conn->prepare($sql);
+        $stmt->bind_param("s",$username);
+        $stmt->execute();
+        $result =$stmt->get_result();
+        if($result->num_rows == 1)
+        {
+            $row =$result->fetch_assoc();
+           $dbPassword = $row["password"];
+          
+        }
+        return $dbPassword;
+    }
