@@ -10,7 +10,7 @@ $app->post('/custommer/addPass', function (Request $request, Response $response,
     // $username = $body['username'];
     // $password = $body['password'];
     $hashPass = password_hash($jsonData['password'],PASSWORD_DEFAULT);
-    $sql = 'UPDATE customer SET password = ? where username = ? ';
+    $sql = 'UPDATE owner SET password = ? where username = ? ';
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ss",$hashPass,$jsonData['username']);
     $stmt->execute();
