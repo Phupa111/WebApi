@@ -13,6 +13,29 @@ $app->post('/bill/insert', function (Request $request, Response $response, $args
     $stmt->execute();
     $result = $stmt->get_result();
 
+
+
+ 
+ 
+    $response->getBody()->write(json_encode($result, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
+    return $response
+    ->withHeader('Content-Type', 'application/json; charset=utf-8')
+    ->withStatus(200);
+  
+ 
+});
+
+$app->post('/bill/updateStatus', function (Request $request, Response $response, $args) {
+
+    $conn =$GLOBALS['connect'];
+    $json = $request->getBody();
+    $jsonData = json_decode($json,true);
+    $sql = 'INSERT INTO `bill`(`bid`, `cid`, `dateDay`, `status`, `totalPrice`) VALUES (null,?,NOW(),"ยังไม่ชำระเงิน",0)';
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i",$jsonData['cid']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
    
 
 

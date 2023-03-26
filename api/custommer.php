@@ -52,6 +52,23 @@ $app->post('/custommer/login', function (Request $request, Response $response, $
   
  
 });
+$app->post('/updateMoney', function (Request $request, Response $response, $args) {
+    $json = $request->getBody();
+    $jsonData = json_decode($json,true);
+    $conn =$GLOBALS['connect'];
+   
+    $sql = 'UPDATE customer SET money = money - ? WHERE cid = ?';
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('ii', $jsonData['money'],$jsonData['cid']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+  
+    $response->getBody()->write(json_encode($result, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
+    return $response
+    ->withHeader('Content-Type', 'application/json; charset=utf-8')
+    ->withStatus(200);
+  
+});
 
 $app->get('/getCusid/{username}', function (Request $request, Response $response, $args) {
     $conn =$GLOBALS['connect'];
