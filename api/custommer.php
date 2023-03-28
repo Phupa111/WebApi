@@ -62,6 +62,8 @@ $app->post('/updateMoney', function (Request $request, Response $response, $args
     $stmt->bind_param('ii', $jsonData['money'],$jsonData['cid']);
     $stmt->execute();
     $result = $stmt->get_result();
+    
+    
   
     $response->getBody()->write(json_encode($result, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
     return $response
