@@ -117,5 +117,31 @@ $app->delete('/bil/delete/{bid}', function (Request $request, Response $response
 
 });
 
+$app->post('/updateBillsMoney', function (Request $request, Response $response, $args) {
+    $json = $request->getBody();
+    $jsonData = json_decode($json,true);
+    $conn =$GLOBALS['connect'];
 
+    $sql = 'UPDATE bill SET totalPrice = ? WHERE bid = ?';
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('ii', $jsonData['money'],$jsonData['bid']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    $sql = 'UPDATE bill SET status = "กำลังจัดส่ง" WHERE bid = ?';
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('i',$jsonData['bid']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+
+
+
+  
+    $response->getBody()->write(json_encode($result, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
+    return $response
+    ->withHeader('Content-Type', 'application/json; charset=utf-8')
+    ->withStatus(200);
+  
+});
 ?>
