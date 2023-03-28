@@ -95,6 +95,24 @@
      
     });
 
+    $app->post('/update/status', function (Request $request, Response $response, $args) {
+        $json = $request->getBody();
+        $jsonData = json_decode($json,true);
+        $conn =$GLOBALS['connect'];
+    
+        $sql = 'UPDATE bill SET status = ? WHERE bid = ?';
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('si', $jsonData['status'],$jsonData['bid']);
+        $stmt->execute();
+        $result = $stmt->get_result();
+      
+        $response->getBody()->write(json_encode($result, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
+        return $response
+        ->withHeader('Content-Type', 'application/json; charset=utf-8')
+        ->withStatus(200);
+      
+    });
+
     function getPasswordOwner($conn,$username)
     {
         $sql = "SELECT password from owner where username = ?";
