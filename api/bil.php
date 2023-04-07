@@ -144,4 +144,20 @@ $app->post('/updateBillsMoney', function (Request $request, Response $response, 
     ->withStatus(200);
   
 });
+
+$app->post('/updateAdressAndPhone', function (Request $request, Response $response, $args) {
+    $json = $request->getBody();
+    $jsonData = json_decode($json,true);
+    $conn =$GLOBALS['connect'];
+    $sql = 'UPDATE bill SET Adress = ?, phone = ? WHERE bid = ?';
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('ssi', $jsonData['Adress'],$jsonData['phone'],$jsonData['bid']);
+    $stmt->execute();
+      
+    $response->getBody()->write(json_encode(["message" => "Update successful"], JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
+    return $response
+    ->withHeader('Content-Type', 'application/json; charset=utf-8')
+    ->withStatus(200);
+  
+});
 ?>

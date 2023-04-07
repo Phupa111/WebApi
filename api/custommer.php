@@ -154,4 +154,52 @@ function getPasswordFromDB($conn,$username)
         return $dbPassword;
     }
 
+    $app->post('/register', function (Request $request, Response $response, $args) {
+
+        $conn =$GLOBALS['connect'];
+        $json = $request->getBody();
+        $jsonData = json_decode($json,true);
+        $sql = 'INSERT INTO `customer`(`cid`, `name`, `username`, `password`, `money`, `address`, `phone`) VALUES (null,?,?,?,0,?,?)';
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("sssss",$jsonData['name'],$jsonData['username'],$jsonData['password'],$jsonData['address'],$jsonData['phone']);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    
+        $hashPass = password_hash($jsonData['password'],PASSWORD_DEFAULT);
+        $sql = 'UPDATE customer SET password = ? where username = ? ';
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ss",$hashPass,$jsonData['username']);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+     
+     
+        $response->getBody()->write(json_encode($result, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
+        return $response
+        ->withHeader('Content-Type', 'application/json; charset=utf-8')
+        ->withStatus(200);
+      
+     
+    });
+
+    $app->post('/addMoney', function (Request $request, Response $response, $args) {
+        $json = $request->getBody();
+        $jsonData = json_decode($json,true);
+        $conn =$GLOBALS['connect'];
+       
+        $sql = 'UPDATE customer SET money = money +? WHERE cid = ?';
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('ii', $jsonData['money'],$jsonData['cid']);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        
+      
+        $response->getBody()->write(json_encode($result, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
+        return $response
+        ->withHeader('Content-Type', 'application/json; charset=utf-8')
+        ->withStatus(200);
+      
+    });
+
 ?>

@@ -6,7 +6,8 @@
         $conn = $GLOBALS['connect'];
         $sql = "select 	bill.bid,bill.cid,customer.name,bill.status,bill.totalPrice,bill.dateDay as day
                 FROM	customer,bill
-                where 	customer.cid = bill.cid";
+                where 	customer.cid = bill.cid
+                Order by bill.bid";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -45,9 +46,10 @@
       
     });
 
+
     $app->get('/nameCustomer/{bid}', function (Request $request, Response $response, $args) {
         $conn = $GLOBALS['connect'];
-        $sql = "select customer.name,bill.status,bill.totalPrice,bill.dateDay as day
+        $sql = "select customer.name,bill.status,bill.Adress,bill.phone,bill.totalPrice,bill.dateDay as day
                 FROM	customer,bill
                 where 	customer.cid = bill.cid
                 and     bill.bid = ?";
@@ -66,7 +68,6 @@
         return $response->withHeader('Content-Type','application/json; charset=utf-8')
                         ->withStatus(200);
     });
-
     $app->post('/ownerLogin', function (Request $request, Response $response, $args) {
         $json = $request->getBody();
         $jsonData = json_decode($json,true);
