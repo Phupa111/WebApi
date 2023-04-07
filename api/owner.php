@@ -114,6 +114,45 @@
       
     });
 
+    $app->get('/customer/show/all', function (Request $request, Response $response, $args) {
+        $conn = $GLOBALS['connect'];
+        $sql = "select 	* from customer";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $data = array();
+
+        foreach($result as $row){
+            array_push($data,$row);
+        }
+
+        $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
+        return $response->withHeader('Content-Type','application/json; charset=utf-8')
+                        ->withStatus(200);
+    });
+
+    $app->post('/customer/show/detail', function (Request $request, Response $response, $args) {
+        $json = $request->getBody();
+        $jsonData = json_decode($json,true);
+        $conn =$GLOBALS['connect'];
+    
+        $sql = 'select 	* from customer where cid = ?';
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('i', $jsonData['cid']);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $data = array();
+
+        foreach($result as $row){
+            array_push($data,$row);
+        }
+        $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
+        return $response
+        ->withHeader('Content-Type', 'application/json; charset=utf-8')
+        ->withStatus(200);
+      
+    });
+
     function getPasswordOwner($conn,$username)
     {
         $sql = "SELECT password from owner where username = ?";

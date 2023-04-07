@@ -138,6 +138,29 @@ $app->get('/customer/bill/detail/{bid}', function (Request $request, Response $r
   
 });
 
+$app->post('/customer/register/checkUsername', function (Request $request, Response $response, $args) {
+    $json = $request->getBody();
+    $jsonData = json_decode($json,true);
+    $conn =$GLOBALS['connect'];
+    // $body = $request->getParsedBody();
+    // $username = $body['username'];
+   
+    $sql = "select 	* from customer
+    where username = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('s',$jsonData['username']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $data = array();
+    array_push($data,$result->num_rows);
+  
+    $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
+    return $response
+    ->withHeader('Content-Type', 'application/json; charset=utf-8')
+    ->withStatus(200);
+  
+});
+
 function getPasswordFromDB($conn,$username)
     {
         $sql = "SELECT password from customer where username = ?";
